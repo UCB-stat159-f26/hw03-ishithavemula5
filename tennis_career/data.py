@@ -88,3 +88,10 @@ def _clean_match_data(matches, birthdate):
     df = df[df["result"].isin(["W", "L"])]
     df = df.dropna(subset=["player_age", "opponent_age", "age_diff"])
     return df[["match_date", "opponent", "player_age", "opponent_age", "age_diff", "result"]]
+
+def get_player_matches(player_name):
+    js_text = _download_match_data(player_name)
+    matches = _parse_match_data(js_text)
+    birthdate = _get_player_birthdate(player_name)
+    return _clean_match_data(matches, birthdate)
+
