@@ -74,3 +74,17 @@ def _get_player_birthdate(player_name):
             return match.group(1)
 
     raise ValueError(f"Could not find birthdate for '{player_name}'.")
+
+
+def _clean_match_data(matches, birthdate):
+    df = matches[[0, 4, 11, 16]].copy()
+    df.columns = ["match_date", "result", "opponent", "opponent_info"]
+    df["player_age"] = df["match_date"].apply(
+        lambda date: _calculate_player_age(date, birthdate))
+    df["opponent_age"] = df.apply(
+        lambda row: _calculate_opponent_age(row["match_date"], row["opponent_info"]),
+        axis=1)
+    df["age_diff"] = df["player_age"] - df["opponent_age"]
+    df = df[df["result"].isin(["W", "L"])]
+    df = df.dropna(subset=["player_age", "opponent_age", "age_diff"])
+    return df[["match_date", "opponent", "player_age", "opponent_age", "age_diff", "result"]]
