@@ -1,4 +1,5 @@
 import pytest
+import pandas as pd
 
 from tennis_career.data import (
     _parse_match_data,
@@ -68,3 +69,25 @@ def test_clean_male_matches():
     assert cleaned.iloc[0]["result"] == "L"
     assert cleaned.iloc[1]["result"] == "W"
     assert cleaned.iloc[0]["age_diff"] < 0
+
+from tennis_career.data import _format_player_name, _calculate_player_age
+
+
+def test_empty_player_name():
+    with pytest.raises(ValueError, match="valid player name"):
+        _format_player_name("")
+
+
+def test_invalid_player_name_type():
+    with pytest.raises(ValueError, match="valid player name"):
+        _format_player_name(123)
+
+
+def test_missing_opponent_age():
+    age = _calculate_opponent_age("19951030", "")
+    assert pd.isna(age)
+
+
+def test_invalid_birthdate():
+    age = _calculate_player_age("19951030", "invalid")
+    assert pd.isna(age)
