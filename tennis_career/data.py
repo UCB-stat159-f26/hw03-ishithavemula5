@@ -53,3 +53,12 @@ def _calculate_opponent_age(match_date, opponent):
         return (match_date - birthdate).days / 365.25
 
     return pd.to_numeric(value, errors="coerce")
+
+def _calculate_player_age(match_date, birthdate):
+    match_date = pd.to_datetime(str(match_date), format="%Y%m%d", errors="coerce")
+    birthdate = pd.to_datetime(str(birthdate), format="%Y%m%d", errors="coerce")
+
+    if pd.isna(match_date) or pd.isna(birthdate):
+        return float("nan")
+
+    return (match_date - birthdate).days / 365.25
