@@ -1,5 +1,8 @@
+from unittest.mock import patch, Mock
+from tennis_career.data import _download_match_data
 import pytest
 import pandas as pd
+import requests
 
 from tennis_career.data import (
     _parse_match_data,
@@ -91,3 +94,10 @@ def test_missing_opponent_age():
 def test_invalid_birthdate():
     age = _calculate_player_age("19951030", "invalid")
     assert pd.isna(age)
+
+def test_unknown_player():
+    response = Mock()
+    response.raise_for_status.side_effect = requests.HTTPError("404 Not Found")
+    with patch("tennis_career.data.requests.get", return_value=response):
+        with pytest.raises(ValueError, match="Could not find career data"):
+            _download_match_data("GastonSanchez")
