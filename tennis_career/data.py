@@ -1,4 +1,8 @@
+import json
+import re
+import pandas as pd
 import requests
+
 def _format_player_name(player_name):
     if not isinstance(player_name, str) or not player_name.strip():
         raise ValueError("Please enter a valid player name.")
@@ -27,3 +31,11 @@ def _download_match_data(player_name):
         ) from error
 
     return response.text
+
+def _parse_match_data(js_text):
+    match = re.search(r"var\s+morematchmx\s*=\s*(\[[\s\S]*?\])\s*;", js_text)
+    if not match:
+        raise ValueError("Could not find match data in the JavaScript file.")
+
+    matches = json.loads(match.group(1))
+    return pd.DataFrame(matches)
