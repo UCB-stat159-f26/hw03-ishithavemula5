@@ -39,3 +39,17 @@ def _parse_match_data(js_text):
 
     matches = json.loads(match.group(1))
     return pd.DataFrame(matches)
+
+def _calculate_opponent_age(match_date, opponent):
+    if pd.isna(opponent) or opponent == "":
+        return float("nan")
+
+    value = str(opponent)
+    if len(value) == 8 and value.isdigit():
+        birthdate = pd.to_datetime(value, format="%Y%m%d", errors="coerce")
+        match_date = pd.to_datetime(str(match_date), format="%Y%m%d", errors="coerce")
+        if pd.isna(birthdate) or pd.isna(match_date):
+            return float("nan")
+        return (match_date - birthdate).days / 365.25
+
+    return pd.to_numeric(value, errors="coerce")
