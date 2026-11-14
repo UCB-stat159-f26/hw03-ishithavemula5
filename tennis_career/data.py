@@ -62,3 +62,15 @@ def _calculate_player_age(match_date, birthdate):
         return float("nan")
 
     return (match_date - birthdate).days / 365.25
+
+def _get_player_birthdate(player_name):
+    name = _format_player_name(player_name)
+    for player_type in ["wplayer", "player"]:
+        url = f"https://www.tennisabstract.com/cgi-bin/{player_type}.cgi"
+        response = requests.get(url, params={"p": name}, timeout=15)
+        response.raise_for_status()
+        match = re.search(r"var\s+dob\s*=\s*['\"]?(\d{8})", response.text)
+        if match:
+            return match.group(1)
+
+    raise ValueError(f"Could not find birthdate for '{player_name}'.")
